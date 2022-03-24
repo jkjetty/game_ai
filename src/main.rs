@@ -126,130 +126,142 @@ fn update_game(game: &mut Game, rl: &RaylibHandle) {
 
         if !game.pause {
             // player movement logic
-            if rl.is_key_down(KEY_LEFT) {
+            if rl.is_key_down(KEY_LEFT) || rl.is_key_down(KEY_H) {
                 game.player.position.x -= 5.0;
             }
             if game.player.position.x - game.player.size.x / 2.0 <= 0.0 {
                 game.player.position.x = game.player.size.x / 2.0;
             }
-            if rl.is_key_down(KEY_RIGHT) {
+            if rl.is_key_down(KEY_RIGHT) || rl.is_key_down(KEY_L) {
                 game.player.position.x += 5.0;
             }
             if game.player.position.x + game.player.size.x / 2.0 >= w {
                 game.player.position.x = w - game.player.size.x / 2.0;
             }
+            if rl.is_key_down(KEY_UP) || rl.is_key_down(KEY_K) {
+                game.player.position.y -= 5.0;
+            }
+            if game.player.position.y + game.player.size.y / 2.0 >= h {
+                game.player.position.y = h - game.player.size.y / 2.0;
+            }
+            if rl.is_key_down(KEY_DOWN) || rl.is_key_down(KEY_J) {
+                game.player.position.y += 5.0;
+            }
+            if game.player.position.y - game.player.size.y / 2.0 <= 0.0 {
+                game.player.position.y = game.player.size.y / 2.0;
+            }
 
             // Ball launching logic
-            if !game.ball.active {
-                if rl.is_key_pressed(KEY_SPACE) {
-                    game.ball.active = true;
-                    game.ball.speed = Vector2::new(0.0, -5.0);
-                }
-            }
+            //if !game.ball.active {
+            //    if rl.is_key_pressed(KEY_SPACE) {
+            //        game.ball.active = true;
+            //        game.ball.speed = Vector2::new(0.0, -5.0);
+            //    }
+            //}
 
             // Ball movement logic
-            if game.ball.active {
-                game.ball.position += game.ball.speed;
-            } else {
-                game.ball.position = Vector2::new(game.player.position.x, h * 7.0 / 8.0 - 30.0);
-            }
+            //if game.ball.active {
+            //    game.ball.position += game.ball.speed;
+            //} else {
+            //    game.ball.position = Vector2::new(game.player.position.x, h * 7.0 / 8.0 - 30.0);
+            //}
 
             // Collision logic: ball vs walls
-            if game.ball.position.x + game.ball.radius as f32 >= w
-                || game.ball.position.x - game.ball.radius as f32 <= 0.0
-            {
-                game.ball.speed.x *= -1.0;
-            }
-            if game.ball.position.y - game.ball.radius as f32 <= 0.0 {
-                game.ball.speed.y *= -1.0;
-            }
-            if game.ball.position.y + game.ball.radius as f32 >= h {
-                game.ball.speed = Vector2::default();
-                game.ball.active = false;
-                game.player.life -= 1;
-            }
+            //if game.ball.position.x + game.ball.radius as f32 >= w
+            //    || game.ball.position.x - game.ball.radius as f32 <= 0.0
+            //{
+            //    game.ball.speed.x *= -1.0;
+            //}
+            //if game.ball.position.y - game.ball.radius as f32 <= 0.0 {
+            //    game.ball.speed.y *= -1.0;
+            //}
+            //if game.ball.position.y + game.ball.radius as f32 >= h {
+            //    game.ball.speed = Vector2::default();
+            //    game.ball.active = false;
+            //    game.player.life -= 1;
+            //}
 
             // Collision logic: ball vs player
-            let r = Rectangle::new(
-                game.player.position.x - game.player.size.x / 2.0,
-                game.player.position.y - game.player.size.y / 2.0,
-                game.player.size.x,
-                game.player.size.y,
-            );
-            if r.check_collision_circle_rec(game.ball.position, game.ball.radius as f32) {
-                if game.ball.speed.y > 0.0 {
-                    game.ball.speed.y *= -1.0;
-                    game.ball.speed.x = (game.ball.position.x - game.player.position.x)
-                        / (game.player.size.x / 2.0)
-                        * 5.0;
-                }
-            }
+            //let r = Rectangle::new(
+            //    game.player.position.x - game.player.size.x / 2.0,
+            //    game.player.position.y - game.player.size.y / 2.0,
+            //    game.player.size.x,
+            //    game.player.size.y,
+            //);
+            //if r.check_collision_circle_rec(game.ball.position, game.ball.radius as f32) {
+            //    if game.ball.speed.y > 0.0 {
+            //        game.ball.speed.y *= -1.0;
+            //        game.ball.speed.x = (game.ball.position.x - game.player.position.x)
+            //            / (game.player.size.x / 2.0)
+            //            * 5.0;
+            //    }
+            //}
 
             // Collision logic: ball vs bricks
-            for i in 0..LINES_OF_BRICKS {
-                for j in 0..BRICKS_PER_LINE {
-                    if game.bricks[i][j].active {
-                        // Hit below
-                        if (game.ball.position.y - game.ball.radius as f32
-                            <= game.bricks[i][j].position.y + game.brick_size.y / 2.0)
-                            && (game.ball.position.y - game.ball.radius as f32
-                                > game.bricks[i][j].position.y
-                                    + game.brick_size.y / 2.0
-                                    + game.ball.speed.y)
-                            && ((game.ball.position.x - game.bricks[i][j].position.x).abs()
-                                < game.brick_size.x / 2.0 + game.ball.radius as f32 * 2.0 / 3.0)
-                            && game.ball.speed.y < 0.0
-                        {
-                            game.bricks[i][j].active = false;
-                            game.ball.speed.y *= -1.0;
-                        }
-                        // Hit above
-                        else if game.ball.position.y + game.ball.radius as f32
-                            >= game.bricks[i][j].position.y - game.brick_size.y / 2.0
-                            && (game.ball.position.y + game.ball.radius as f32)
-                                .partial_cmp(
-                                    &(game.bricks[i][j].position.y - game.brick_size.y / 2.0
-                                        + game.ball.speed.y),
-                                )
-                                .unwrap()
-                                == std::cmp::Ordering::Less
-                            && (game.ball.position.x - game.bricks[i][j].position.x).abs()
-                                < game.brick_size.x / 2.0 + game.ball.radius as f32 * 2.0 / 3.0
-                            && game.ball.speed.y > 0.0
-                        {
-                            game.bricks[i][j].active = false;
-                            game.ball.speed.y *= -1.0;
-                        }
-                        // Hit Left
-                        else if ((game.ball.position.x + game.ball.radius as f32)
-                            >= (game.bricks[i][j].position.x - game.brick_size.x / 2.0))
-                            && ((game.ball.position.x + game.ball.radius as f32)
-                                < (game.bricks[i][j].position.x - game.brick_size.x / 2.0
-                                    + game.ball.speed.x))
-                            && (((game.ball.position.y - game.bricks[i][j].position.y).abs())
-                                < (game.brick_size.y / 2.0 + game.ball.radius as f32 * 2.0 / 3.0))
-                            && (game.ball.speed.x > 0.0)
-                        {
-                            game.bricks[i][j].active = false;
-                            game.ball.speed.x *= -1.0;
-                        }
-                        // Hit right
-                        else if ((game.ball.position.x - game.ball.radius as f32)
-                            <= (game.bricks[i][j].position.x + game.brick_size.x / 2.0))
-                            && ((game.ball.position.x - game.ball.radius as f32)
-                                > (game.bricks[i][j].position.x
-                                    + game.brick_size.x / 2.0
-                                    + game.ball.speed.x))
-                            && (((game.ball.position.y - game.bricks[i][j].position.y).abs())
-                                < (game.brick_size.y / 2.0 + game.ball.radius as f32 * 2.0 / 3.0))
-                            && (game.ball.speed.x < 0.0)
-                        {
-                            game.bricks[i][j].active = false;
-                            game.ball.speed.x *= -1.0;
-                        }
-                    }
-                }
-            }
+            //for i in 0..LINES_OF_BRICKS {
+            //    for j in 0..BRICKS_PER_LINE {
+            //        if game.bricks[i][j].active {
+            //            // Hit below
+            //            if (game.ball.position.y - game.ball.radius as f32
+            //                <= game.bricks[i][j].position.y + game.brick_size.y / 2.0)
+            //                && (game.ball.position.y - game.ball.radius as f32
+            //                    > game.bricks[i][j].position.y
+            //                        + game.brick_size.y / 2.0
+            //                        + game.ball.speed.y)
+            //                && ((game.ball.position.x - game.bricks[i][j].position.x).abs()
+            //                    < game.brick_size.x / 2.0 + game.ball.radius as f32 * 2.0 / 3.0)
+            //                && game.ball.speed.y < 0.0
+            //            {
+            //                game.bricks[i][j].active = false;
+            //                game.ball.speed.y *= -1.0;
+            //            }
+            //            // Hit above
+            //            else if game.ball.position.y + game.ball.radius as f32
+            //                >= game.bricks[i][j].position.y - game.brick_size.y / 2.0
+            //                && (game.ball.position.y + game.ball.radius as f32)
+            //                    .partial_cmp(
+            //                        &(game.bricks[i][j].position.y - game.brick_size.y / 2.0
+            //                            + game.ball.speed.y),
+            //                    )
+            //                    .unwrap()
+            //                    == std::cmp::Ordering::Less
+            //                && (game.ball.position.x - game.bricks[i][j].position.x).abs()
+            //                    < game.brick_size.x / 2.0 + game.ball.radius as f32 * 2.0 / 3.0
+            //                && game.ball.speed.y > 0.0
+            //            {
+            //                game.bricks[i][j].active = false;
+            //                game.ball.speed.y *= -1.0;
+            //            }
+            //            // Hit Left
+            //            else if ((game.ball.position.x + game.ball.radius as f32)
+            //                >= (game.bricks[i][j].position.x - game.brick_size.x / 2.0))
+            //                && ((game.ball.position.x + game.ball.radius as f32)
+            //                    < (game.bricks[i][j].position.x - game.brick_size.x / 2.0
+            //                        + game.ball.speed.x))
+            //                && (((game.ball.position.y - game.bricks[i][j].position.y).abs())
+            //                    < (game.brick_size.y / 2.0 + game.ball.radius as f32 * 2.0 / 3.0))
+            //                && (game.ball.speed.x > 0.0)
+            //            {
+            //                game.bricks[i][j].active = false;
+            //                game.ball.speed.x *= -1.0;
+            //            }
+            //            // Hit right
+            //            else if ((game.ball.position.x - game.ball.radius as f32)
+            //                <= (game.bricks[i][j].position.x + game.brick_size.x / 2.0))
+            //                && ((game.ball.position.x - game.ball.radius as f32)
+            //                    > (game.bricks[i][j].position.x
+            //                        + game.brick_size.x / 2.0
+            //                        + game.ball.speed.x))
+            //                && (((game.ball.position.y - game.bricks[i][j].position.y).abs())
+            //                    < (game.brick_size.y / 2.0 + game.ball.radius as f32 * 2.0 / 3.0))
+            //                && (game.ball.speed.x < 0.0)
+            //            {
+            //                game.bricks[i][j].active = false;
+            //                game.ball.speed.x *= -1.0;
+            //            }
+            //        }
+            //    }
+            //}
 
             // Game over life
             if game.player.life <= 0 {
@@ -260,6 +272,7 @@ fn update_game(game: &mut Game, rl: &RaylibHandle) {
                     for j in 0..BRICKS_PER_LINE {
                         if game.bricks[i][j].active {
                             game.game_over = false;
+                            break;
                         }
                     }
                 }
@@ -293,32 +306,32 @@ fn draw_game(game: &Game, rl: &mut RaylibHandle, thread: &RaylibThread) {
         }
 
         // Draw ball
-        d.draw_circle_v(game.ball.position, game.ball.radius as f32, Color::MAROON);
+        //d.draw_circle_v(game.ball.position, game.ball.radius as f32, Color::MAROON);
 
         // Draw bricks
-        for i in 0..LINES_OF_BRICKS {
-            for j in 0..BRICKS_PER_LINE {
-                if game.bricks[i][j].active {
-                    if (i + j) % 2 == 0 {
-                        d.draw_rectangle(
-                            (game.bricks[i][j].position.x - game.brick_size.x / 2.0) as i32,
-                            (game.bricks[i][j].position.y - game.brick_size.y / 2.0) as i32,
-                            game.brick_size.x as i32,
-                            game.brick_size.y as i32,
-                            Color::GRAY,
-                        );
-                    } else {
-                        d.draw_rectangle(
-                            (game.bricks[i][j].position.x - game.brick_size.x / 2.0) as i32,
-                            (game.bricks[i][j].position.y - game.brick_size.y / 2.0) as i32,
-                            game.brick_size.x as i32,
-                            game.brick_size.y as i32,
-                            Color::DARKGRAY,
-                        );
-                    }
-                }
-            }
-        }
+        //for i in 0..LINES_OF_BRICKS {
+        //    for j in 0..BRICKS_PER_LINE {
+        //        if game.bricks[i][j].active {
+        //            if (i + j) % 2 == 0 {
+        //                d.draw_rectangle(
+        //                    (game.bricks[i][j].position.x - game.brick_size.x / 2.0) as i32,
+        //                    (game.bricks[i][j].position.y - game.brick_size.y / 2.0) as i32,
+        //                    game.brick_size.x as i32,
+        //                    game.brick_size.y as i32,
+        //                    Color::GRAY,
+        //                );
+        //            } else {
+        //                d.draw_rectangle(
+        //                    (game.bricks[i][j].position.x - game.brick_size.x / 2.0) as i32,
+        //                    (game.bricks[i][j].position.y - game.brick_size.y / 2.0) as i32,
+        //                    game.brick_size.x as i32,
+        //                    game.brick_size.y as i32,
+        //                    Color::DARKGRAY,
+        //                );
+        //            }
+        //        }
+        //    }
+        //}
 
         if game.pause {
             d.draw_text(
@@ -326,7 +339,7 @@ fn draw_game(game: &Game, rl: &mut RaylibHandle, thread: &RaylibThread) {
                 (w / 2.0) as i32 - measure_text("Game Paused", 40) / 2,
                 (h / 2.0 - 40.0) as i32,
                 40,
-                Color::GRAY,
+                Color::YELLOW,
             );
         }
     } else {
