@@ -3,6 +3,10 @@ name = "pgaibe"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "basic"
+path = "src/basic.rs"
+
 
 [dependencies]
 raylib = { version = "3.7" }
