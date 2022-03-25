@@ -92,7 +92,7 @@ fn init_game(game: &mut Game, rl: &RaylibHandle) {
         rl.get_screen_width() as f32 / 2.0,
         rl.get_screen_height() as f32 * 7.0 / 8.0,
     );
-    game.player.size = Vector2::new(rl.get_screen_width() as f32 / 10.0, 20.0);
+    game.player.size = Vector2::new(20.0, 20.0);
     game.player.life = PLAYER_MAX_LIFE;
 
     // Initialize ball
@@ -126,25 +126,25 @@ fn update_game(game: &mut Game, rl: &RaylibHandle) {
 
         if !game.pause {
             // player movement logic
-            if rl.is_key_down(KEY_LEFT) || rl.is_key_down(KEY_H) {
+            if rl.is_key_down(KEY_LEFT) || rl.is_key_down(KEY_H) || rl.is_key_down(KEY_A) {
                 game.player.position.x -= 5.0;
             }
             if game.player.position.x - game.player.size.x / 2.0 <= 0.0 {
                 game.player.position.x = game.player.size.x / 2.0;
             }
-            if rl.is_key_down(KEY_RIGHT) || rl.is_key_down(KEY_L) {
+            if rl.is_key_down(KEY_RIGHT) || rl.is_key_down(KEY_L) || rl.is_key_down(KEY_D) {
                 game.player.position.x += 5.0;
             }
             if game.player.position.x + game.player.size.x / 2.0 >= w {
                 game.player.position.x = w - game.player.size.x / 2.0;
             }
-            if rl.is_key_down(KEY_UP) || rl.is_key_down(KEY_K) {
+            if rl.is_key_down(KEY_UP) || rl.is_key_down(KEY_K) || rl.is_key_down(KEY_W) {
                 game.player.position.y -= 5.0;
             }
             if game.player.position.y + game.player.size.y / 2.0 >= h {
                 game.player.position.y = h - game.player.size.y / 2.0;
             }
-            if rl.is_key_down(KEY_DOWN) || rl.is_key_down(KEY_J) {
+            if rl.is_key_down(KEY_DOWN) || rl.is_key_down(KEY_J) || rl.is_key_down(KEY_S) {
                 game.player.position.y += 5.0;
             }
             if game.player.position.y - game.player.size.y / 2.0 <= 0.0 {
@@ -301,9 +301,9 @@ fn draw_game(game: &Game, rl: &mut RaylibHandle, thread: &RaylibThread) {
         );
 
         // Draw player lives
-        for i in 0..game.player.life {
-            d.draw_rectangle(20 + 30 * i, h as i32 - 30, 35, 10, Color::LIGHTGRAY);
-        }
+        //for i in 0..game.player.life {
+        //    d.draw_rectangle(20 + 30 * i, h as i32 - 30, 35, 10, Color::LIGHTGRAY);
+        //}
 
         // Draw ball
         //d.draw_circle_v(game.ball.position, game.ball.radius as f32, Color::MAROON);
