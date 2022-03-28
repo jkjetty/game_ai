@@ -7,6 +7,9 @@ edition = "2021"
 name = "basic"
 path = "src/basic.rs"
 
+[[bin]]
+name = "westworld"
+path = "src/westworld/westworld.rs"
 
 [dependencies]
 raylib = { version = "3.7" }
