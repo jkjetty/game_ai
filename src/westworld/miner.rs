@@ -7,8 +7,8 @@ pub enum Location {
 
 pub struct Miner<'a> {
     id: usize,
-    pub state: &'a dyn State,
-    previous_state: &'a dyn State,
+    pub state: &'a State,
+    previous_state: &'a State,
     pub location: Location,
     pub gold_carried: usize,
     pub gold_in_bank: usize,
@@ -35,7 +35,7 @@ impl<'a> Miner<'a> {
         self.state.execute(self);
     }
 
-    pub fn change_state(&mut self, new_state: &'a dyn State) {
+    pub fn change_state(&mut self, new_state: &'a State) {
         self.state.exit(self);
         self.previous_state = self.state;
         self.state = new_state;
